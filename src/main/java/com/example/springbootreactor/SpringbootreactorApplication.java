@@ -18,7 +18,7 @@ public class SpringbootreactorApplication implements CommandLineRunner {
 
   @Override
   public void run(String... args) {
-    Flux<String> names = Flux.just("Andres", "Pedro", "Diego", "")
+    Flux<String> names = Flux.just("Andres", "Pedro", "Diego", "Maria")
         .doOnNext(name -> {
               if (name.isEmpty()) {
                 throw new RuntimeException("Nombre no puede ser vacio");
@@ -28,6 +28,7 @@ public class SpringbootreactorApplication implements CommandLineRunner {
             }
         );
 
-    names.subscribe(log::info, error -> log.error(error.getMessage()));
+    names.subscribe(log::info, error -> log.error(error.getMessage()),
+        () -> log.info("Ha finalizado el flux."));
   }
 }
