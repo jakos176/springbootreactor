@@ -19,24 +19,23 @@ public class SpringbootreactorApplication implements CommandLineRunner {
 
   @Override
   public void run(String... args) {
-    Flux<User> names = Flux.just("Andres Guzman", "Pedro Fulano", "Diego Sultano", "Maria Fulano",
-            "Brucee Lee", "Bruce Willis")
-        .map(name -> new User(name.split(" ")[0].toUpperCase(), name.split(" ")[1].toUpperCase()))
-        .filter(user -> user.getName().equalsIgnoreCase("Bruce"))
-        .doOnNext(user -> {
-              if (user == null) {
-                throw new RuntimeException("Nombre no puede ser vacio");
-              } else {
-                System.out.println(user.getName().concat(" " + user.getSurname()));
-              }
-            }
-        ).map(user -> {
+    Flux<String> names = Flux.just("Andres Guzman", "Pedro Fulano", "Diego Sultano", "Maria Fulano",
+        "Brucee Lee", "Bruce Willis");
+
+    Flux<User> map = names.map(
+            name -> new User(name.split(" ")[0].toUpperCase(), name.split(" ")[1].toUpperCase()))
+        .filter(user -> user.getName().equalsIgnoreCase("Bruce")).doOnNext(user -> {
+          if (user == null) {
+            throw new RuntimeException("Nombre no puede ser vacio");
+          } else {
+            System.out.println(user.getName().concat("" + user.getSurname()));
+          }
+        }).map(user -> {
           user.setName(user.getName().toLowerCase());
           return user;
         });
 
-    names.subscribe(user -> log.info(user.getName()),
-        error -> log.error(error.getMessage()),
+    names.subscribe(user -> log.info(user), error -> log.error(error.getMessage()),
         () -> log.info("Ha finalizado el flux."));
   }
 }
