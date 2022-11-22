@@ -1,6 +1,7 @@
 package com.example.springbootreactor;
 
 import com.example.springbootreactor.models.User;
+import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.CommandLineRunner;
@@ -19,8 +20,14 @@ public class SpringbootreactorApplication implements CommandLineRunner {
 
   @Override
   public void run(String... args) {
-    Flux<String> names = Flux.just("Andres Guzman", "Pedro Fulano", "Diego Sultano", "Maria Fulano",
-        "Brucee Lee", "Bruce Willis");
+
+    List<String> listNames = List.of("Andres Guzman", "Pedro Fulano", "Diego Sultano",
+        "Maria Fulano", "Brucee Lee", "Bruce Willis");
+
+    Flux<String> names = Flux.fromIterable(listNames);
+
+    /*Flux<String> names = Flux.just("Andres Guzman", "Pedro Fulano", "Diego Sultano", "Maria Fulano",
+        "Brucee Lee", "Bruce Willis");*/
 
     Flux<User> map = names.map(
             name -> new User(name.split(" ")[0].toUpperCase(), name.split(" ")[1].toUpperCase()))
