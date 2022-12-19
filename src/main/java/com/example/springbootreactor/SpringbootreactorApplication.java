@@ -22,7 +22,7 @@ public class SpringbootreactorApplication implements CommandLineRunner {
 
   @Override
   public void run(String... args) {
-    ejemploToString();
+    ejemploCollectList();
   }
 
   public void ejemploFlatMap() {
@@ -43,6 +43,20 @@ public class SpringbootreactorApplication implements CommandLineRunner {
           user.setName(user.getName().toLowerCase());
           return user;
         }).subscribe(user -> log.info(user.toString()));
+  }
+
+  public void ejemploCollectList() {
+    List<User> users = new ArrayList<>();
+    users.add(new User("Andres ", "Guzman"));
+    users.add(new User("Pedro", "Fulano"));
+    users.add(new User("Diego", "Sultano"));
+    users.add(new User("Maria", "Fulano"));
+    users.add(new User("Brucee", "Lee"));
+    users.add(new User("Brucee", "Willis"));
+
+    Flux.fromIterable(users)
+        .collectList()
+        .subscribe(lista -> lista.forEach(user -> log.info(user.toString())));
   }
 
   public void ejemploToString() {
