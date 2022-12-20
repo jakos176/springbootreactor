@@ -6,6 +6,7 @@ import com.example.springbootreactor.models.UserComments;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CountDownLatch;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.CommandLineRunner;
@@ -24,8 +25,8 @@ public class SpringbootreactorApplication implements CommandLineRunner {
   }
 
   @Override
-  public void run(String... args) {
-    ejemploIntervalElement();
+  public void run(String... args) throws InterruptedException {
+    ejemploIntervalInfinite();
   }
 
   public void ejemploInterval() {
@@ -39,6 +40,22 @@ public class SpringbootreactorApplication implements CommandLineRunner {
     Flux.range(1, 12).delayElements(Duration.ofSeconds(1))
         .subscribe(i -> log.info(i.toString()));
     //usar block last para ver el resultado en pantalla
+  }
+
+  public void ejemploIntervalInfinite() throws InterruptedException {
+    CountDownLatch latch = new CountDownLatch(1);
+    Flux.interval(Duration.ofSeconds(1))
+        .doOnTerminate(latch::countDown)
+        .flatMap(i -> {
+          if (i >= 5) {
+            return Flux.error(new InterruptedException("Solo hasta 5"));
+          }
+          return Flux.just(i);
+        })
+        .map(i -> "Hola " + 1)
+        .retry(2)
+        .doOnNext(s -> log.info(s.toString())).subscribe();
+    latch.await();
   }
 
   private void ejemploWithZipRanges() {
