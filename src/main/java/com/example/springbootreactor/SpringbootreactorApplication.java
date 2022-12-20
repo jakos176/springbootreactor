@@ -24,7 +24,7 @@ public class SpringbootreactorApplication implements CommandLineRunner {
 
   @Override
   public void run(String... args) {
-    ejemploUserComenntFlatMap();
+    ejemploUserComenntZipWith();
   }
 
   public void ejemploFlatMap() {
@@ -105,7 +105,7 @@ public class SpringbootreactorApplication implements CommandLineRunner {
         () -> log.info("Ha finalizado el flux."));
   }
 
-  private void ejemploUserComenntFlatMap() {
+  private void ejemploUserComenntZipWith2() {
     Mono<User> userMono = Mono.fromCallable(() -> new User("John", "Doe"));
     Mono<Comments> commentMono = Mono.fromCallable(() -> {
       Comments comments = new Comments();
@@ -114,8 +114,26 @@ public class SpringbootreactorApplication implements CommandLineRunner {
       return comments;
     });
 
-    userMono.flatMap(user -> commentMono.map(comment -> new UserComments(user, comment)))
-        .subscribe(userComments -> log.info(userComments.toString()));
+    Mono<UserComments> userCommentsMono = userMono.zipWith(commentMono)
+        .map(tuple -> {
+          User user = tuple.getT1();
+          Comments comments = tuple.getT2();
+          return new UserComments(user, comments);
+        });
+    userCommentsMono.subscribe(userComments -> log.info(userComments.toString()));
+  }
+
+  private void ejemploUserComenntZipWith() {
+    Mono<User> userMono = Mono.fromCallable(() -> new User("John", "Doe"));
+    Mono<Comments> commentMono = Mono.fromCallable(() -> {
+      Comments comments = new Comments();
+      comments.AddComment("hello!");
+      comments.AddComment("goodbye!");
+      return comments;
+    });
+
+    Mono<UserComments> userCommentsMono = userMono.zipWith(commentMono, UserComments::new);
+    userCommentsMono.subscribe(userComments -> log.info(userComments.toString()));
   }
 
 }
