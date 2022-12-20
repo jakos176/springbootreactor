@@ -3,6 +3,7 @@ package com.example.springbootreactor;
 import com.example.springbootreactor.models.Comments;
 import com.example.springbootreactor.models.User;
 import com.example.springbootreactor.models.UserComments;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 import org.slf4j.Logger;
@@ -24,7 +25,20 @@ public class SpringbootreactorApplication implements CommandLineRunner {
 
   @Override
   public void run(String... args) {
-    ejemploWithZipRanges();
+    ejemploIntervalElement();
+  }
+
+  public void ejemploInterval() {
+    Flux<Integer> range = Flux.range(1, 12);
+    Flux<Long> interval = Flux.interval(Duration.ofSeconds(1));
+    range.zipWith(interval, (r, i) -> i).subscribe(i -> log.info(i.toString()));
+    //usar block last para ver el resultado en pantalla
+  }
+
+  public void ejemploIntervalElement() {
+    Flux.range(1, 12).delayElements(Duration.ofSeconds(1))
+        .subscribe(i -> log.info(i.toString()));
+    //usar block last para ver el resultado en pantalla
   }
 
   private void ejemploWithZipRanges() {
