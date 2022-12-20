@@ -1,6 +1,8 @@
 package com.example.springbootreactor;
 
+import com.example.springbootreactor.models.Comments;
 import com.example.springbootreactor.models.User;
+import com.example.springbootreactor.models.UserComments;
 import java.util.ArrayList;
 import java.util.List;
 import org.slf4j.Logger;
@@ -22,7 +24,7 @@ public class SpringbootreactorApplication implements CommandLineRunner {
 
   @Override
   public void run(String... args) {
-    ejemploCollectList();
+    ejemploUserComenntFlatMap();
   }
 
   public void ejemploFlatMap() {
@@ -102,4 +104,18 @@ public class SpringbootreactorApplication implements CommandLineRunner {
     names.subscribe(user -> log.info(user), error -> log.error(error.getMessage()),
         () -> log.info("Ha finalizado el flux."));
   }
+
+  private void ejemploUserComenntFlatMap() {
+    Mono<User> userMono = Mono.fromCallable(() -> new User("John", "Doe"));
+    Mono<Comments> commentMono = Mono.fromCallable(() -> {
+      Comments comments = new Comments();
+      comments.AddComment("hello!");
+      comments.AddComment("goodbye!");
+      return comments;
+    });
+
+    userMono.flatMap(user -> commentMono.map(comment -> new UserComments(user, comment)))
+        .subscribe(userComments -> log.info(userComments.toString()));
+  }
+
 }
