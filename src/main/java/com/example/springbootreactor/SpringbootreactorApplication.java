@@ -6,6 +6,8 @@ import com.example.springbootreactor.models.UserComments;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.concurrent.CountDownLatch;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,7 +28,7 @@ public class SpringbootreactorApplication implements CommandLineRunner {
 
   @Override
   public void run(String... args) throws InterruptedException {
-    ejemploIntervalInfinite();
+    ejemploIntervalInfiniteDesdeCreate();
   }
 
   public void ejemploInterval() {
@@ -40,6 +42,33 @@ public class SpringbootreactorApplication implements CommandLineRunner {
     Flux.range(1, 12).delayElements(Duration.ofSeconds(1))
         .subscribe(i -> log.info(i.toString()));
     //usar block last para ver el resultado en pantalla
+  }
+
+  public void ejemploIntervalInfiniteDesdeCreate() {
+    Flux.create(emitter -> {
+          Timer timer = new Timer();
+          timer.schedule(new TimerTask() {
+
+            private int contador = 0;
+
+            @Override
+            public void run() {
+              emitter.next(++contador);
+              if (contador == 10) {
+                timer.cancel();
+                emitter.complete();
+              }
+              if (contador == 5) {
+                emitter.error(new NullPointerException("Has metido una null"));
+                timer.cancel();
+              }
+
+            }
+          }, 1000, 1000);
+        })
+        .subscribe(next -> log.info(next.toString()),
+            next -> log.error(next.getMessage()),
+            () -> log.info("Hemos terminado"));
   }
 
   public void ejemploIntervalInfinite() throws InterruptedException {
