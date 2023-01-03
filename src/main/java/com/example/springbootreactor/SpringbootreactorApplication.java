@@ -28,7 +28,7 @@ public class SpringbootreactorApplication implements CommandLineRunner {
 
   @Override
   public void run(String... args) throws InterruptedException {
-    ejemploIntervalInfiniteDesdeCreate();
+    ejemploContrapresion();
   }
 
   public void ejemploInterval() {
@@ -42,6 +42,45 @@ public class SpringbootreactorApplication implements CommandLineRunner {
     Flux.range(1, 12).delayElements(Duration.ofSeconds(1))
         .subscribe(i -> log.info(i.toString()));
     //usar block last para ver el resultado en pantalla
+  }
+
+  public void ejemploContrapresion() {
+    Flux.range(1, 10)
+        .log()
+        .limitRate(5)
+        .subscribe();/*new Subscriber<>() {
+
+
+          private Subscription subscription;
+          private int limit = 5;
+          private int consumed = 0;
+
+          @Override
+          public void onSubscribe(Subscription s) {
+            this.subscription = s;
+            subscription.request(limit);
+          }
+
+          @Override
+          public void onNext(Integer integer) {
+            log.info(integer.toString());
+            consumed++;
+            if (consumed == limit) {
+              consumed = 0;
+              subscription.request(limit);
+            }
+          }
+
+          @Override
+          public void onError(Throwable t) {
+
+          }
+
+          @Override
+          public void onComplete() {
+
+          }
+        }*/
   }
 
   public void ejemploIntervalInfiniteDesdeCreate() {
